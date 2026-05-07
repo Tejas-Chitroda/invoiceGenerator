@@ -26,6 +26,7 @@ builder.Services.AddDbContext<InvoiceDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICustomerValidationService, CustomerValidationService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductPrice, IProductPriceService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();

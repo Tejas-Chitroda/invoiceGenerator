@@ -10,10 +10,12 @@ namespace Invoice_Generator.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
+        private readonly ICustomerValidationService _validationService;
 
-        public CustomerController(ICustomerService customerService)
+        public CustomerController(ICustomerService customerService, ICustomerValidationService validationService)
         {
             _customerService = customerService;
+            _validationService = validationService;
         }
 
         [HttpGet]
@@ -40,6 +42,13 @@ namespace Invoice_Generator.Controllers
             if (customer == null)
             {
                 return BadRequest("Customer cannot be null");
+            }
+
+            // Validate customer
+            var validationResult = await _validationService.ValidateCustomerAsync(customer);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult);
             }
 
             var customerModel = new Customer
