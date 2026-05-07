@@ -13,12 +13,14 @@ namespace InvoiceGenerator.Test.Controllers
     public class CustomerControllerTest
     {
         private readonly Mock<ICustomerService> _mockService;
+        private readonly Mock<ICustomerValidationService> _mockValidationService;
         private readonly CustomerController _controller;
 
         public CustomerControllerTest()
         {
             _mockService = new Mock<ICustomerService>();
-            _controller = new CustomerController(_mockService.Object);
+            _mockValidationService = new Mock<ICustomerValidationService>();
+            _controller = new CustomerController(_mockService.Object, _mockValidationService.Object);
         }
 
         [Fact]
@@ -59,6 +61,8 @@ namespace InvoiceGenerator.Test.Controllers
         public async Task AddCustomer_ReturnsOkResult_WhenCustomerIsValid()
         {
             var dto = new CustomerDto { Name = "Test", Email = "test@example.com" };
+            var validationResult = new ValidationResultDto { IsValid = true };
+            _mockValidationService.Setup(v => v.ValidateCustomerAsync(dto)).ReturnsAsync(validationResult);
 
             var result = await _controller.AddCustomer(dto);
 
@@ -74,6 +78,53 @@ namespace InvoiceGenerator.Test.Controllers
 
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Customer cannot be null", badRequest.Value);
+        }
+
+        [Fact]
+        public async Task AddCustomer_ReturnsBadRequest_WhenValidationFails()
+        {
+            var dto = new CustomerDto { Name = "", Email = "invalid" };
+            var validationResult = new ValidationResultDto
+            {
+                IsValid = false,
+                Errors = new Dictionary<string, string>
+                {
+                    { "Name", "Name is required" },
+                    { "Email", "Invalid email format" }
+                }
+            };
+            _mockValidationService.Setup(v => v.ValidateCustomerAsync(dto)).ReturnsAsync(validationResult);
+
+            var result = await _controller.AddCustomer(dto);
+
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            var returnedResult = Assert.IsType<ValidationResultDto>(badRequest.Value);
+            Assert.False(returnedResult.IsValid);
+            Assert.Equal(2, returnedResult.Errors.Count);
+            _mockService.Verify(s => s.AddCustomerAsync(It.IsAny<Customer>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task AddCustomer_ReturnsBadRequest_WhenEmailIsDuplicate()
+        {
+            var dto = new CustomerDto { Name = "Test", Email = "existing@example.com" };
+            var validationResult = new ValidationResultDto
+            {
+                IsValid = false,
+                Errors = new Dictionary<string, string>
+                {
+                    { "Email", "Email already exists" }
+                }
+            };
+            _mockValidationService.Setup(v => v.ValidateCustomerAsync(dto)).ReturnsAsync(validationResult);
+
+            var result = await _controller.AddCustomer(dto);
+
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            var returnedResult = Assert.IsType<ValidationResultDto>(badRequest.Value);
+            Assert.False(returnedResult.IsValid);
+            Assert.True(returnedResult.Errors.ContainsKey("Email"));
+            _mockService.Verify(s => s.AddCustomerAsync(It.IsAny<Customer>()), Times.Never);
         }
 
         [Fact]
