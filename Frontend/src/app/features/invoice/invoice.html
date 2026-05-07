@@ -1,0 +1,114 @@
+<div class="container py-4">
+  <h2 class="mb-4 text-center">Create Invoice</h2>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white fw-bold">New Invoice</div>
+    <div class="card-body">
+      <div class="mb-3">
+        <label class="form-label">Select Customer</label>
+        <select class="form-select" [(ngModel)]="selectedCustomerId">
+          <option value="0">Select Customer</option>
+          <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <div class="row align-items-end mb-3">
+        <div class="col-md-5">
+          <label class="form-label">Select Product</label>
+          <select class="form-select" [(ngModel)]="selectedProductId">
+            <option value="0">Select Product</option>
+            <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-control" [(ngModel)]="quantity" min="1" />
+        </div>
+
+        <div class="col-md-4">
+          <button class="btn btn-success mt-3 w-100" [disabled]="!isFormValid()" (click)="addItem()">Add Item</button>
+        </div>
+      </div>
+
+      <ul class="list-group mb-3" *ngIf="items.length > 0">
+        <li class="list-group-item" *ngFor="let i of items">
+          {{ getProductName(i.productId) }} - Qty: {{ i.quantity }}
+        </li>
+      </ul>
+
+      <button class="btn btn-primary" (click)="submitInvoice()">Submit Invoice</button>
+    </div>
+  </div>
+
+  <!-- Invoice List -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white fw-bold">All Invoices</div>
+    <div class="card-body p-0">
+      <table class="table table-striped table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>GrandTotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let invoice of invoices"
+            (click)="openInvoiceDetails(invoice.id!)"
+            style="cursor: pointer"
+          >
+            <td>{{ getCustomerName(invoice.customerId) }}</td>
+            <td>{{ invoice.invoiceDate | date }}</td>
+            <td>{{ getInvoiceTotalByInvoiceId(invoice.id) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    *ngIf="showModal"
+    style="background: rgba(0, 0, 0, 0.5)"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Invoice Details</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>SubTotal</th>
+                <th>Tax</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let detail of selectedInvoiceDetails">
+                <td>{{ getProductName(detail.productId) }}</td>
+                <td>{{ detail.quantity }}</td>
+                <td>{{ detail.rate }}</td>
+                <td>{{ detail.subTotal }}</td>
+                <td>{{ detail.tax }}</td>
+                <td>{{ detail.grandTotal }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

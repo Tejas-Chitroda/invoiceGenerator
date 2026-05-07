@@ -1,0 +1,33 @@
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">📦 Product Dashboard</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/category" routerLinkActive="active">Category</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/customer" routerLinkActive="active">Customer</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/product" routerLinkActive="active">Product</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/invoice" routerLinkActive="active">Invoice</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<!-- Main Content -->
+<div class="container">
+  <router-outlet></router-outlet>
+</div>

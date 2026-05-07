@@ -1,0 +1,105 @@
+<!-- MAIN CONTENT -->
+<div class="container">
+  <!-- Product Management Section -->
+  <section class="mb-5">
+    <h2 class="text-primary">🛒 Manage Products</h2>
+
+    <form (ngSubmit)="submitForm()" class="row g-3 mb-3">
+      <div class="col-md-4">
+        <input type="text" [(ngModel)]="productFormItem.name" name="name" class="form-control"
+          placeholder="Product Name" required />
+      </div>
+
+      <div class="col-md-4">
+        <input type="number" [(ngModel)]="productFormItem.taxPercentage" name="tax" class="form-control"
+          placeholder="Tax %" required />
+      </div>
+
+      <div class="col-md-4">
+        <select [(ngModel)]="productFormItem.categoryId" name="categoryId" class="form-select" required>
+          <option value="0">Select Category</option>>
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <input type="text" [(ngModel)]="productFormItem.description" name="description" class="form-control"
+          placeholder="Description" required />
+      </div>
+
+      <div class="col-auto">
+        <button type="submit" class="btn btn-success">{{ isEditing ? 'Update' : 'Add' }} Product</button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="resetForm()" *ngIf="isEditing">Cancel</button>
+      </div>
+    </form>
+
+    <h3 class="text-secondary">📋 Product List</h3>
+    <table class="table table-bordered table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Tax %</th>
+          <th>Category</th>
+          <th>Price (Today)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products">
+          <td>{{ p.name }}</td>
+          <td>{{ p.taxPercentage }}%</td>
+          <td>{{ getCategoryName(p.category) }}</td>
+          <td><button class="btn btn-outline-info btn-sm" (click)="getTodayPrice(p.id!)">Check</button></td>
+          <td>
+            <button class="btn btn-warning btn-sm me-1" (click)="edit(p)">Edit</button>
+            <button class="btn btn-danger btn-sm" (click)="delete(p.id!)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Product Price Section -->
+  <section>
+    <h3 class="text-primary">💲 Set Product Price</h3>
+
+    <form (ngSubmit)="setPrice()" class="row g-3">
+      <div class="col-md-4">
+        <select [(ngModel)]="priceFormItem.productId" name="productId" class="form-select" required>
+          <option value="0" disabled selected>Select Product</option>
+          <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <input type="number" [(ngModel)]="priceFormItem.price" name="price" class="form-control" placeholder="Price"
+          required />
+      </div>
+
+      <div class="col-md-4">
+        <select [(ngModel)]="priceFormItem.isDefault" name="isDefaultText" class="form-select" required
+          (ngModelChange)="onDefaultChange()">
+          <option value="0" disabled selected>Default? (Yes/No)</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label>Effective From</label>
+        <input type="date" [(ngModel)]="priceFormItem.effectiveFrom" name="fromDate" class="form-control"
+          [disabled]="priceFormItem.isDefault" />
+      </div>
+
+      <div class="col-md-6">
+        <label>Effective To</label>
+        <input type="date" [(ngModel)]="priceFormItem.effectiveTo" name="toDate" class="form-control"
+          [disabled]="priceFormItem.isDefault" />
+      </div>
+
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">Set Price</button>
+      </div>
+    </form>
+  </section>
+</div>

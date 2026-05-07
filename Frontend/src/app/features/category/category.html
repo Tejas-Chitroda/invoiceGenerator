@@ -1,0 +1,96 @@
+<div class="container mt-4 ">
+  <!-- Header -->
+  <div class="text-center mb-4 ">
+    <h2 class="fw-bold text-primary">Category Management</h2>
+    
+    <hr />
+  </div>
+
+  <!-- Form Card -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white fw-bold">
+      {{ isEdit ? 'Edit Category' : 'Add New Category' }}
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="submitCategory()" #form="ngForm" class="row g-3">
+        <div class="col-md-6">
+          <label for="name" class="form-label">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            [(ngModel)]="category.name"
+            name="name"
+            placeholder="Enter category name"
+            required
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="description" class="form-label">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            id="description"
+            [(ngModel)]="category.description"
+            name="description"
+            placeholder="Enter description"
+            required
+          />
+        </div>
+
+        <div class="col-12 d-flex justify-content-start mt-3">
+          <button type="submit" class="btn btn-primary me-2">
+            {{ isEdit ? 'Update' : 'Add' }} Category
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            *ngIf="isEdit"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card mt-4 shadow-sm">
+    <div class="card-header bg-dark text-white fw-bold">
+      Category List
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-bordered table-striped mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th style="width: 150px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of categories">
+            <td>{{ c.name }}</td>
+            <td>{{ c.description }}</td>
+            <td>
+              <button
+                class="btn btn-sm btn-success me-2"
+                (click)="editForm(c)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteCategoryById(c.id!)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
