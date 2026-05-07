@@ -26,6 +26,19 @@ namespace InvoiceGenerator.Test.Services
         }
 
         [Fact]
+        public async Task ValidateCustomerAsync_NullCustomer_ReturnsInvalidResult()
+        {
+            var result = await _service.ValidateCustomerAsync(null);
+
+            Assert.False(result.IsValid);
+            Assert.True(result.Errors.ContainsKey("Customer"));
+            Assert.Equal("Customer cannot be null", result.Errors["Customer"]);
+            _customerRepoMock.Verify(
+                r => r.FindAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<Customer, bool>>>()),
+                Times.Never);
+        }
+
+        [Fact]
         public async Task ValidateCustomerAsync_ValidCustomer_ReturnsValidResult()
         {
             var dto = new CustomerDto { Name = "Test User", Email = "test@example.com" };
