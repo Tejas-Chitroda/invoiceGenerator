@@ -18,6 +18,13 @@ namespace Invoice_Generator.Services.Implementations
         {
             var result = new ValidationResultDto { IsValid = true };
 
+            if (customer == null)
+            {
+                result.IsValid = false;
+                result.Errors.Add("Customer", "Customer cannot be null");
+                return result;
+            }
+
             // Validate required fields
             if (string.IsNullOrWhiteSpace(customer.Name))
             {
