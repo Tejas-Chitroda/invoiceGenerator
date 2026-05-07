@@ -40,9 +40,9 @@ namespace Invoice_Generator.Services.Implementations
                 }
                 else
                 {
-                    // Check for duplicate email
+                    // Check for duplicate email (case-insensitive)
                     var existingCustomer = await _unitOfWork.Customers
-                        .FindAsync(c => c.Email == customer.Email);
+                        .FindAsync(c => c.Email != null && c.Email.ToLower() == customer.Email.ToLower());
                     
                     if (existingCustomer.Any())
                     {

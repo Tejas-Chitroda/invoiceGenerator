@@ -94,6 +94,21 @@ namespace InvoiceGenerator.Test.Services
         }
 
         [Fact]
+        public async Task ValidateCustomerAsync_DuplicateEmailDifferentCase_ReturnsInvalidResult()
+        {
+            var dto = new CustomerDto { Name = "Test User", Email = "Existing@Example.COM" };
+            var existingCustomer = new Customer { Id = 1, Name = "Existing", Email = "existing@example.com" };
+            _customerRepoMock.Setup(r => r.FindAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<Customer, bool>>>()))
+                .ReturnsAsync(new List<Customer> { existingCustomer });
+
+            var result = await _service.ValidateCustomerAsync(dto);
+
+            Assert.False(result.IsValid);
+            Assert.True(result.Errors.ContainsKey("Email"));
+            Assert.Equal("Email already exists", result.Errors["Email"]);
+        }
+
+        [Fact]
         public async Task ValidateCustomerAsync_MultipleErrors_ReturnsAllErrors()
         {
             var dto = new CustomerDto { Name = "", Email = "" };
