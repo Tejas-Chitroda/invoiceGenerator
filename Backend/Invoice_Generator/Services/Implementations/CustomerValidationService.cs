@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using System.Net.Mail;
 using Invoice_Generator.DTOs;
 using Invoice_Generator.Services.Interfaces;
 using Invoice_Generator.UoW;
@@ -8,10 +8,6 @@ namespace Invoice_Generator.Services.Implementations
     public class CustomerValidationService : ICustomerValidationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private static readonly Regex EmailRegex = new Regex(
-            @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase
-        );
 
         public CustomerValidationService(IUnitOfWork unitOfWork)
         {
@@ -36,8 +32,8 @@ namespace Invoice_Generator.Services.Implementations
             }
             else
             {
-                // Validate email format
-                if (!EmailRegex.IsMatch(customer.Email))
+                // Validate email format using .NET's MailAddress
+                if (!IsValidEmail(customer.Email))
                 {
                     result.IsValid = false;
                     result.Errors.Add("Email", "Invalid email format");
@@ -57,6 +53,19 @@ namespace Invoice_Generator.Services.Implementations
             }
 
             return result;
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var mailAddress = new MailAddress(email);
+                return mailAddress.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
