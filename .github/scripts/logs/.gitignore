@@ -1,0 +1,3 @@
+# Don't ignore log files in this folder
+!*.log
+!.gitkeep
