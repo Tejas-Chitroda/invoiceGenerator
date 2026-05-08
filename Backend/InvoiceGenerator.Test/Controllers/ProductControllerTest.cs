@@ -14,12 +14,14 @@ namespace Invoice_Generator.Tests.Controllers
     public class ProductControllerTests
     {
         private readonly Mock<IProductService> _productServiceMock;
+        private readonly Mock<IProductValidationService> _validationServiceMock;
         private readonly ProductController _controller;
 
         public ProductControllerTests()
         {
             _productServiceMock = new Mock<IProductService>();
-            _controller = new ProductController(_productServiceMock.Object);
+            _validationServiceMock = new Mock<IProductValidationService>();
+            _controller = new ProductController(_productServiceMock.Object, _validationServiceMock.Object);
         }
 
         [Fact]
@@ -60,6 +62,9 @@ namespace Invoice_Generator.Tests.Controllers
         public async Task AddProduct_ValidProduct_ReturnsOk()
         {
             var productDto = new ProductDto { Name = "P1", CategoryId = 1, TaxPercentage = 5 };
+            _validationServiceMock
+                .Setup(v => v.ValidateProductAsync(productDto))
+                .ReturnsAsync(new ValidationResultDto { IsValid = true });
 
             var result = await _controller.AddProduct(productDto);
 
@@ -75,6 +80,24 @@ namespace Invoice_Generator.Tests.Controllers
 
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Product cannot be null", badRequest.Value);
+        }
+
+        [Fact]
+        public async Task AddProduct_InvalidProduct_ReturnsBadRequestWithValidationResult()
+        {
+            var productDto = new ProductDto { Name = "", CategoryId = 0, TaxPercentage = 5 };
+            var validationResult = new ValidationResultDto { IsValid = false };
+            validationResult.Errors.Add("Name", "Name is required");
+            validationResult.Errors.Add("CategoryId", "CategoryId must be a positive integer");
+            _validationServiceMock
+                .Setup(v => v.ValidateProductAsync(productDto))
+                .ReturnsAsync(validationResult);
+
+            var result = await _controller.AddProduct(productDto);
+
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal(validationResult, badRequest.Value);
+            _productServiceMock.Verify(s => s.AddProductAsync(It.IsAny<Product>()), Times.Never);
         }
 
         [Fact]

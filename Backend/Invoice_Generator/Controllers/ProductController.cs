@@ -10,10 +10,12 @@ namespace Invoice_Generator.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IProductValidationService _validationService;
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, IProductValidationService validationService)
         {
             _productService = productService;
+            _validationService = validationService;
         }
 
         [HttpGet]
@@ -41,6 +43,14 @@ namespace Invoice_Generator.Controllers
             {
                 return BadRequest("Product cannot be null");
             }
+
+            // Validate product
+            var validationResult = await _validationService.ValidateProductAsync(product);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult);
+            }
+
             var productModel = new Product
             {
                 Name = product.Name,
