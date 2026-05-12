@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Invoice_Generator.Controllers
 {
+    /// <summary>
+    /// Handles CRUD operations for products and returns today's price for a product.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
@@ -18,6 +21,9 @@ namespace Invoice_Generator.Controllers
             _validationService = validationService;
         }
 
+        /// <summary>
+        /// Gets all products.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAllProduct()
         {
@@ -25,6 +31,9 @@ namespace Invoice_Generator.Controllers
             return Ok(products);
         }
 
+        /// <summary>
+        /// Gets a product by id.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -36,6 +45,9 @@ namespace Invoice_Generator.Controllers
             return Ok(product);
         }
 
+        /// <summary>
+        /// Creates a new product after validation.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] ProductDto product)
         {
@@ -63,10 +75,13 @@ namespace Invoice_Generator.Controllers
             return Ok(product);
         }
 
+        /// <summary>
+        /// Updates an existing product.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProductById(int id, [FromBody] ProductDto product)
         {
-            if (id == null || id == 0)
+            if (id == 0)
             {
                 return BadRequest("Product data is invalid");
             }
@@ -88,6 +103,9 @@ namespace Invoice_Generator.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Deletes a product by id.
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductById(int id)
         {
@@ -99,6 +117,9 @@ namespace Invoice_Generator.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Gets today's price for a product.
+        /// </summary>
         [HttpGet("price/{productId}")]
         public async Task<IActionResult> GetPriceForToday(int productId)
         {
